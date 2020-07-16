@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import requests
 
 app = Flask(__name__)
-api = Api(app)
+#api = Api(app)
 
 @app.route('/chapter_image_links')
 def get_chapter_image_links():
