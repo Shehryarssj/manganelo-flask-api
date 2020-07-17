@@ -1,5 +1,4 @@
 flask
-flask_restful
 bs4
 requests
 gunicorn
