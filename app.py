@@ -1,5 +1,4 @@
 from flask import Flask,request
-from flask_restful import Resource, Api
 from bs4 import BeautifulSoup
 import requests
 
