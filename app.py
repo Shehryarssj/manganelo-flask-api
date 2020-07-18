@@ -20,7 +20,7 @@ def get_chapter_image_links():
     result = {'image_links':image_links}
     return result
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def get_main_page():
     mangas = []
     headers = {
