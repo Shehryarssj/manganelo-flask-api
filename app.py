@@ -110,7 +110,8 @@ def get_manga_info():
 
     manga_info_div = soup.find_all('div', {'class': 'story-info-right'})
     manga_name = manga_info_div[0].find('h1').text
-    manga_image = soup.find('img', {'class': 'img-loading'})['src']
+    manga_image_div = soup.find('div', {'class': 'story-info-left'})
+    manga_image = manga_image_div.find('img')['src']
 
     li = soup.findAll('li', {'class': 'a-h'})
     li.reverse()
