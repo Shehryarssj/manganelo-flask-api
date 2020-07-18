@@ -114,7 +114,6 @@ def get_manga_info():
     manga_image = manga_image_div.find('img')['src']
 
     li = soup.findAll('li', {'class': 'a-h'})
-    li.reverse()
     for item in li:
         anchor_tag = item.find('a')
         chapters.append(anchor_tag['href'])
