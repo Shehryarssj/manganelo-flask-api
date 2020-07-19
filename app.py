@@ -112,8 +112,8 @@ def get_manga_info():
     res = requests.get(url, headers=headers)
     soup = BeautifulSoup(res.text, 'lxml')
 
-    manga_info_div = soup.find_all('div', {'class': 'story-info-right'})
-    manga_name = manga_info_div[0].find('h1').text
+    manga_info_div = soup.find_all('div', {'class': 'story-info-right'})[0]
+    manga_name = manga_info_div.find('h1').text
     manga_image_div = soup.find('div', {'class': 'story-info-left'})
     manga_image = manga_image_div.find('img')['src']
 
@@ -122,15 +122,20 @@ def get_manga_info():
         anchor_tag = item.find('a')
         chapters.append(anchor_tag['href'])
 
-    author_status_genre = manga_info_div[0].find_all('tr')
+    author_status_genre = manga_info_div.find_all('tr')
 
-    author_anchor_tags = author_status_genre[1].find_all('a')
+    if len(author_status_genre)==4:
+    	i = 1
+    else:
+    	i = 0
+
+    author_anchor_tags = author_status_genre[i].find_all('a')
     for tag in author_anchor_tags:
         authors.append(tag.text)
-
-    status = author_status_genre[2].find('td',{'class':'table-value'}).text
-
-    genre_anchor_tags = author_status_genre[3].find_all('a')
+    i+=1
+    status = author_status_genre[i].find('td',{'class':'table-value'}).text
+    i+=1
+    genre_anchor_tags = author_status_genre[i].find_all('a')
     for tag in genre_anchor_tags:
         genres.append(tag.text)
 
