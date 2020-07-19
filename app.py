@@ -67,9 +67,9 @@ def get_total_search_result_pages():
     else:
         panel_search_story_div = soup.find('div',{'class':'panel-search-story'})
         if panel_search_story_div == None:
-            max_pages = 0
+            max_pages = '0'
         else:
-            max_pages = 1
+            max_pages = '1'
     result['maxpages'] = max_pages
     return result
 
