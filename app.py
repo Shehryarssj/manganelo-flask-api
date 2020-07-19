@@ -76,8 +76,8 @@ def get_total_search_result_pages():
 @app.route('/get_search_results_for_page')
 def get_search_results_for_page():
     search_result = {}
-    page_no = request.args.get('page_no')
-    query = request.args.get('query')
+    argument = request.args.get('arg')
+    query,page_no = argument.split(',')
     url = f'https://manganelo.com/search/story/{query}?page={page_no}'
     headers = {
         "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362'}
