@@ -7,12 +7,16 @@ app = Flask(__name__)
 @app.route('/chapter_image_links')
 def get_chapter_image_links():
     url = request.args.get('url')
+    session = requests.Session()
+    jar = requests.cookies.RequestsCookieJar()
+    jar.set('content_server','server2')
+    session.cookies = jar
     image_links = []
     headers = {
         "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362'}
-    res = requests.get(url, headers=headers)
+    res = session.get(url, headers=headers)
     soup = BeautifulSoup(res.text, 'lxml')
-
+    
     images_div = soup.find_all('div', {'class': 'container-chapter-reader'})
     image_tags = images_div[0].find_all('img')
     for image_tag in image_tags:
