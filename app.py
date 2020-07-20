@@ -145,6 +145,10 @@ def get_manga_info():
     genre_anchor_tags = author_status_genre[i].find_all('a')
     for tag in genre_anchor_tags:
         genres.append(tag.text)
-
-    manga_info = {'manga_name':manga_name,'manga_image':manga_image,'authors':authors,'status':status,'genres':genres,'chapters':chapters}
+    
+    description = soup.find('div',{'class':'panel-story-info-description'}).text.strip()
+    description = description.split('\n')
+    description = ''.join(description[1:])
+    
+    manga_info = {'manga_name':manga_name,'manga_image':manga_image,'authors':authors,'status':status,'genres':genres,'chapters':chapters,'description':description}
     return manga_info
