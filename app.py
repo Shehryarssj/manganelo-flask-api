@@ -54,12 +54,6 @@ def get_main_page():
 def get_total_search_result_pages():
     result = {}
     query = request.args.get('query')
-    l = query.split(' ')
-    query = ''
-    for each in l:
-        query += each
-        if each != l[-1]:
-            query += '_'
     headers = {
         "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362'}
     url = f'https://manganelo.com/search/story/{query}'
@@ -84,6 +78,10 @@ def get_search_results_for_page():
     search_result = {}
     argument = request.args.get('arg')
     query,page_no = argument.split(',')
+    l = query.split(' ')
+    seperator = '_'
+    query = seperator.join(l)
+    
     url = f'https://manganelo.com/search/story/{query}?page={page_no}'
     headers = {
         "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362'}
