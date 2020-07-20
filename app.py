@@ -7,12 +7,16 @@ app = Flask(__name__)
 @app.route('/chapter_image_links')
 def get_chapter_image_links():
     url = request.args.get('url')
+    session = requests.Session()
+    jar = requests.cookies.RequestsCookieJar()
+    jar.set('content_server','server2')
+    session.cookies = jar
     image_links = []
     headers = {
         "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362'}
-    res = requests.get(url, headers=headers)
+    res = session.get(url, headers=headers)
     soup = BeautifulSoup(res.text, 'lxml')
-
+    
     images_div = soup.find_all('div', {'class': 'container-chapter-reader'})
     image_tags = images_div[0].find_all('img')
     for image_tag in image_tags:
@@ -29,20 +33,22 @@ def get_main_page():
     res = requests.get(url, headers=headers)
     soup = BeautifulSoup(res.text, 'lxml')
 
-    content_divs = soup.find_all('div', {'class': 'content-homepage-item'})
-
-    for div in content_divs[0:20]:
-        manga_url = div.find('a')['href'].strip()
-        title = div.find('img')['alt'].strip()
-        image = div.find('img')['src'].strip()
-        latest_chapter_para_tag = div.find('p', {'class': 'a-h item-chapter'})
-        latest_chapter_link = latest_chapter_para_tag.find('a')['href'].strip()
-        latest_chapter = latest_chapter_link.split('_')[-1]
-
-        manga = {'title': title, 'image': image, 'latest_chapter': latest_chapter,
-                 'latest_chapter_link': latest_chapter_link, 'manga_url': manga_url}
-        mangas.append(manga)
-
+    try:
+    	content_divs = soup.find_all('div', {'class': 'content-homepage-item'})
+    	latest_chapter_link = ''
+    	latest_chapter = ''
+    	for div in content_divs[0:20]:
+    		manga_url = div.find('a')['href'].strip()
+    		title = div.find('img')['alt'].strip()
+    		image = div.find('img')['src'].strip()
+    		latest_chapter_para_tag = div.find('p', {'class': 'a-h item-chapter'})
+    		latest_chapter_link = latest_chapter_para_tag.find('a')['href'].strip()
+    		latest_chapter = latest_chapter_link.split('_')[-1]
+    		manga = {'title': title, 'image': image, 'latest_chapter': latest_chapter,'latest_chapter_link': latest_chapter_link, 'manga_url': manga_url}
+    		mangas.append(manga)
+    except:
+    	mangas = '0'
+	
     result = {'result':mangas}
     return result
 
@@ -50,6 +56,9 @@ def get_main_page():
 def get_total_search_result_pages():
     result = {}
     query = request.args.get('query')
+    l = query.split(' ')
+    seperator = '_'
+    query = seperator.join(l)
     headers = {
         "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362'}
     url = f'https://manganelo.com/search/story/{query}'
@@ -63,17 +72,21 @@ def get_total_search_result_pages():
     else:
         panel_search_story_div = soup.find('div',{'class':'panel-search-story'})
         if panel_search_story_div == None:
-            max_pages = 0
+            max_pages = '0'
         else:
-            max_pages = 1
+            max_pages = '1'
     result['maxpages'] = max_pages
     return result
 
 @app.route('/get_search_results_for_page')
 def get_search_results_for_page():
     search_result = {}
-    page_no = request.args.get('page_no')
-    query = request.args.get('query')
+    argument = request.args.get('arg')
+    query,page_no = argument.split(',')
+    l = query.split(' ')
+    seperator = '_'
+    query = seperator.join(l)
+    
     url = f'https://manganelo.com/search/story/{query}?page={page_no}'
     headers = {
         "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362'}
@@ -108,8 +121,8 @@ def get_manga_info():
     res = requests.get(url, headers=headers)
     soup = BeautifulSoup(res.text, 'lxml')
 
-    manga_info_div = soup.find_all('div', {'class': 'story-info-right'})
-    manga_name = manga_info_div[0].find('h1').text
+    manga_info_div = soup.find_all('div', {'class': 'story-info-right'})[0]
+    manga_name = manga_info_div.find('h1').text
     manga_image_div = soup.find('div', {'class': 'story-info-left'})
     manga_image = manga_image_div.find('img')['src']
 
@@ -118,17 +131,26 @@ def get_manga_info():
         anchor_tag = item.find('a')
         chapters.append(anchor_tag['href'])
 
-    author_status_genre = manga_info_div[0].find_all('tr')
+    author_status_genre = manga_info_div.find_all('tr')
 
-    author_anchor_tags = author_status_genre[1].find_all('a')
+    if len(author_status_genre)==4:
+    	i = 1
+    else:
+    	i = 0
+
+    author_anchor_tags = author_status_genre[i].find_all('a')
     for tag in author_anchor_tags:
         authors.append(tag.text)
-
-    status = author_status_genre[2].find('td',{'class':'table-value'}).text
-
-    genre_anchor_tags = author_status_genre[3].find_all('a')
+    i+=1
+    status = author_status_genre[i].find('td',{'class':'table-value'}).text
+    i+=1
+    genre_anchor_tags = author_status_genre[i].find_all('a')
     for tag in genre_anchor_tags:
         genres.append(tag.text)
-
-    manga_info = {'manga_name':manga_name,'manga_image':manga_image,'authors':authors,'status':status,'genres':genres,'chapters':chapters}
+    
+    description = soup.find('div',{'class':'panel-story-info-description'}).text.strip()
+    description = description.split('\n')
+    description = ''.join(description[1:])
+    
+    manga_info = {'manga_name':manga_name,'manga_image':manga_image,'authors':authors,'status':status,'genres':genres,'chapters':chapters,'description':description}
     return manga_info
