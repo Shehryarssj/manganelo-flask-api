@@ -54,6 +54,9 @@ def get_main_page():
 def get_total_search_result_pages():
     result = {}
     query = request.args.get('query')
+    l = query.split(' ')
+    seperator = '_'
+    query = seperator.join(l)
     headers = {
         "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362'}
     url = f'https://manganelo.com/search/story/{query}'
