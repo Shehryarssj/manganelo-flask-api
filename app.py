@@ -33,21 +33,18 @@ def get_main_page():
     res = requests.get(url, headers=headers)
     soup = BeautifulSoup(res.text, 'lxml')
 
-    try:
-    	content_divs = soup.find_all('div', {'class': 'content-homepage-item'})
-    	latest_chapter_link = ''
-    	latest_chapter = ''
-    	for div in content_divs[0:20]:
-    		manga_url = div.find('a')['href'].strip()
-    		title = div.find('img')['alt'].strip()
-    		image = div.find('img')['src'].strip()
-    		latest_chapter_para_tag = div.find('p', {'class': 'a-h item-chapter'})
-    		latest_chapter_link = latest_chapter_para_tag.find('a')['href'].strip()
-    		latest_chapter = latest_chapter_link.split('_')[-1]
-    		manga = {'title': title, 'image': image, 'latest_chapter': latest_chapter,'latest_chapter_link': latest_chapter_link, 'manga_url': manga_url}
-    		mangas.append(manga)
-    except:
-    	mangas = '0'
+    content_divs = soup.find_all('div', {'class': 'content-homepage-item'})
+    latest_chapter_link = ''
+    latest_chapter = ''
+    for div in content_divs:
+    	manga_url = div.find('a')['href'].strip()
+    	title = div.find('img')['alt'].strip()
+    	image = div.find('img')['src'].strip()
+    	latest_chapter_para_tag = div.find('p', {'class': 'a-h item-chapter'})
+    	latest_chapter_link = latest_chapter_para_tag.find('a')['href'].strip()
+    	latest_chapter = latest_chapter_link.split('_')[-1]
+    	manga = {'title': title, 'image': image, 'latest_chapter': latest_chapter,'latest_chapter_link': latest_chapter_link, 'manga_url': manga_url}
+    	mangas.append(manga)
 	
     result = {'result':mangas}
     return result
