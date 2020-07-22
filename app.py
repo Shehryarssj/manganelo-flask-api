@@ -41,10 +41,13 @@ def get_main_page():
     	title = div.find('img')['alt'].strip()
     	image = div.find('img')['src'].strip()
     	latest_chapter_para_tag = div.find('p', {'class': 'a-h item-chapter'})
-    	latest_chapter_link = latest_chapter_para_tag.find('a')['href'].strip()
-    	latest_chapter = latest_chapter_link.split('_')[-1]
-    	manga = {'title': title, 'image': image, 'latest_chapter': latest_chapter,'latest_chapter_link': latest_chapter_link, 'manga_url': manga_url}
-    	mangas.append(manga)
+	try:
+		latest_chapter_link = latest_chapter_para_tag.find('a')['href'].strip()
+    		latest_chapter = latest_chapter_link.split('_')[-1]
+    		manga = {'title': title, 'image': image, 'latest_chapter': latest_chapter,'latest_chapter_link': latest_chapter_link, 'manga_url': manga_url}
+    		mangas.append(manga)
+    	except:
+    		pass
 	
     result = {'result':mangas}
     return result
@@ -97,12 +100,15 @@ def get_search_results_for_page():
         for manga_div in manga_items_div:
             manga_img = manga_div.find('img')['src']
             manga_title = manga_div.find('a')['title']
-            latest_chapter_div = manga_div.find('div', {'class': 'item-right'})
-            latest_chapter_link = latest_chapter_div.find('a',{'class':'item-chapter a-h text-nowrap'})['href']
-            latest_chapter = latest_chapter_link.split('_')[-1]
-            manga_url = manga_div.find('a')['href']
-            manga = {'manga_img': manga_img, 'manga_title': manga_title, 'manga_url': manga_url, 'latest_chapter':latest_chapter, 'latest_chapter_link':latest_chapter_link}
-            results.append(manga)
+            try:
+		latest_chapter_div = manga_div.find('div', {'class': 'item-right'})
+            	latest_chapter_link = latest_chapter_div.find('a',{'class':'item-chapter a-h text-nowrap'})['href']
+            	latest_chapter = latest_chapter_link.split('_')[-1]
+            	manga_url = manga_div.find('a')['href']
+            	manga = {'manga_img': manga_img, 'manga_title': manga_title, 'manga_url': manga_url, 'latest_chapter':latest_chapter, 'latest_chapter_link':latest_chapter_link}
+            	results.append(manga)
+	except:
+		pass
     search_result['result'] = results
     return search_result
 
